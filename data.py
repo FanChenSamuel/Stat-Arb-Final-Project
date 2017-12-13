@@ -10,8 +10,6 @@ import pandas as pd
 import platform
 import os
 
-
-
 def getDropboxLoc():
     """
     get the drop box location on each computer.
@@ -21,10 +19,12 @@ def getDropboxLoc():
         path = "C:\\Users\\chenf\\Dropbox\\Stat Arb Data"
     elif compNode == "Golden":
         path = "C:\\Users\\zil20\\Dropbox\\Stat Arb Data"
-        
+    elif compNode == "LAPTOP-DRMK58F0":
+        path = "C:\\Users\\Alex Huang\\Dropbox\\Stat Arb Data"
     return path
 
 dropboxPath = getDropboxLoc()
 
 def getFiveFactorData(path = dropboxPath, dataPath = "Validation Data\\F-F_Research_Data_5_Factors_2x3.CSV"):
     return pd.read_csv(os.path.join(path, dataPath))
+
