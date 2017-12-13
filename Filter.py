@@ -4,7 +4,8 @@ Statistical Arbitrage Team Project
 
 @author: Fan Chen, Zhijiang Huang, Fei Li, Zhixian Lin
 
-@author: chenf
+Special Thanks to Junyi Zhou, Fan's Asset Management Teammate, to provide the 
+start-up code for the project
 """
 import numpy as np
 import scipy.stats.mstats as mstats
@@ -34,3 +35,4 @@ def ranking_filter(score):
 
 def equal_weight(score):
     return (~np.isnan(score)) / np.sum(~np.isnan(score))
+

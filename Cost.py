@@ -1,10 +1,14 @@
-g # -*- coding: utf-8 -*-
+ # -*- coding: utf-8 -*-
 """
-Created on Sun Dec 10 14:29:59 2017
+Statistical Arbitrage Team Project
 
-@author: chenf
+@author: Fan Chen, Zhijiang Huang, Fei Li, Zhixian Lin
+
+Special Thanks to Junyi Zhou, Fan's Asset Management Teammate, to provide the 
+start-up code for the project
 """
 import numpy as np
+
 
 class LinearCost:
     def __init__(self, cost):
@@ -21,6 +25,7 @@ class LinearCost:
         """
         return reposition * self.cost
 
+
 class QuadraticCost:
     def __init__(self, linear, quadratic):
         self.linear = linear
@@ -28,3 +33,14 @@ class QuadraticCost:
 
     def calculate_cost(self, reposition):
         return reposition * self.linear + np.power(reposition, 2) * self.quadratic
+
+
+class ADVCost:
+    def __init__(self, total_value : pd.DataFrame, min_cost, max_cost):
+        self.min_cost = min_cost
+        self.max_cost = max_cost
+        self.total_value = total_value
+
+    def calculate_cost(self, reposition, i):
+        return reposition * (self.min_cost + (self.max_cost-self.min_cost) * np.sqrt(reposition / self.total_value.iloc[i]))
+
