@@ -8,7 +8,7 @@ Special Thanks to Junyi Zhou, Fan's Asset Management Teammate, to provide the
 start-up code for the project
 """
 import numpy as np
-
+import pandas as pd
 
 class LinearCost:
     def __init__(self, cost):

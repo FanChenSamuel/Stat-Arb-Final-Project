@@ -15,14 +15,31 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from functools import partial
 
-from Strategy import Strategy, BetaStrategy
-from Cost import LinearCost, QuadraticCost
+from Strategy import BetaStrategy, MomentumStrategy
+from Cost import LinearCost, QuadraticCost, ADVCost
 from Filter import long_short_filter, ranking_filter, equal_weight
 
+import platform
+import os
+
+def getDropboxLoc():
+    """
+    get the drop box location on each computer.
+    """
+    compNode =  platform.node()
+    if compNode == "DESKTOP-5R528PV":
+        path = "C:\\Users\\chenf\\Dropbox\\Stat Arb Data"
+    elif compNode == "Golden":
+        path = "C:\\Users\\zil20\\Dropbox\\Stat Arb Data"
+        
+    return path
 
 if __name__ == '__main__':
+    
+    dropboxLoc = getDropboxLoc()
     # cap = "small"
     # cap = "mid"
+    os.chdir(os.path.join(dropboxLoc, "Data Framework"))
     cap = "large"
     price = pd.DataFrame.from_csv("{}_price.csv".format(cap))
     volume = pd.DataFrame.from_csv("{}_vol.csv".format(cap))
