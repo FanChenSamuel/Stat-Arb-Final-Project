@@ -18,21 +18,10 @@ from functools import partial
 from Strategy import BetaStrategy, MomentumStrategy
 from Cost import LinearCost, QuadraticCost, ADVCost
 from Filter import long_short_filter, ranking_filter, equal_weight
+from data import getDropboxLoc
 
 import platform
 import os
-
-def getDropboxLoc():
-    """
-    get the drop box location on each computer.
-    """
-    compNode =  platform.node()
-    if compNode == "DESKTOP-5R528PV":
-        path = "C:\\Users\\chenf\\Dropbox\\Stat Arb Data"
-    elif compNode == "Golden":
-        path = "C:\\Users\\zil20\\Dropbox\\Stat Arb Data"
-        
-    return path
 
 if __name__ == '__main__':
     
