@@ -24,6 +24,8 @@ def getDropboxLoc():
         path = "C:\\Users\\zil20\\Dropbox\\Stat Arb Data"
     elif compNode == "LAPTOP-DRMK58F0":
         path = "C:\\Users\\Alex Huang\\Dropbox\\Stat Arb Data"
+    elif compNode == "apple-PC.wv.cc.cmu.edu":
+        path = "/Users/Fei/Dropbox/Stat Arb Data"
     return path
 
 dropboxPath = getDropboxLoc()
