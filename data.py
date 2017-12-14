@@ -108,5 +108,3 @@ def getMergeData():
 def getCleanData(path = dropboxPath, dataPath = os.path.join("Project Data", "cache_clean_data.CSV")):
     df = pd.read_csv(os.path.join(path, dataPath))
     return df
-
-
