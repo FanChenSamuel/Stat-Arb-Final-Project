@@ -5,10 +5,16 @@ Statistical Arbitrage Team Project
 @author: Fan Chen, Zhijiang Huang, Fei Li, Zhixian Lin
 """
 
-from data import getFiveFactorData, get5IndustryPort, get10IndustryPort, get49IndustryPort
+from data import getFiveFactorData, get5IndustryPort, get10IndustryPort, get49IndustryPort, convertMonthToContinuous
 import statsmodels.api as sm
 import pandas as pd
 import numpy  as np
+import matplotlib.pyplot as plt
+
+## Missing Descriptive statistics
+def descStatistics(indDf: pd.DataFrame, rfDf: pd.DataFrame):
+    # Data
+    pass
 
 def regressFactorModel(factorDf: pd.DataFrame, indDf: pd.DataFrame, rfDf: pd.DataFrame, period = 36, min_period = 12):
     """
@@ -92,9 +98,12 @@ if __name__ == "__main__":
     ind_49_factor = regressFactorModel(fiveFactor.iloc[:, 0:6], ind_49, fiveFactor[['Month', 'RF']])
     print("49 Industry Completed!")
     
+    ind_10_alpha = ind_10_factor['Alpha']
+    ind_10_alpha.index = convertMonthToContinuous(ind_10_alpha.index)
     
-    
-    
+    plt.figure(figsize = (8,6))
+    ax1 = ind_10_alpha.iloc[:, 0:5].plot()
+    lines, legends = ax1.get_legend_handles_labels()
     
     
     
