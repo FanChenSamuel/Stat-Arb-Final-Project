@@ -37,11 +37,25 @@ def cleanFrenchData(df):
 
 def cleanCRSP(df):
     # all the codes that will clean crsp go here
-    
+    # clear all the data without NAICS codes
+    df = df[pd.notnull(df['NAICS'])]
+    # change all date format from yyyymmdd to yyyymm
+    df["date"] = df.date // 100
+    # change all the column names to lower case
+    df.columns = [x.lower() for x in list(df)]
     return df
 
 def cleanCompustat(df):
     # all the codes that will clean compustat go here
+    df = df[pd.notnull(df['naics'])]
+    df = df[pd.notnull(df['cusip'])]
+    # change data format from yyyymmdd to yyyymm
+    df["datadate"] = df.datadate // 100
+    # change the datadate column name to date
+    df = df.rename(columns = {'datadate':'date'})
+    # delete the last digit of cusip so that it can be merged with crsp data
+    killdigit = lambda x:x[:-1]
+    df["cusip"] = df["cusip"].apply(killdigit)
     return df
 
 def getFiveFactorData(path = dropboxPath, dataPath = "Validation Data\\F-F_Research_Data_5_Factors_2x3.CSV"):
@@ -68,5 +82,7 @@ def getCompustat(path = dropboxPath, dataPath = "Project Data\\compustat.CSV"):
     df = pd.read_csv(os.path.join(path, dataPath))
     return cleanCompustat(df)
 
+def getMergeData():
+    return pd.merge(getCRSP(), getCompustat(), on=['cusip', 'date'])
 
 
