@@ -10,6 +10,9 @@ import pandas as pd
 import platform
 import os
 
+def convertMonthToContinuous(monthIndex):
+    return (monthIndex // 100) + (monthIndex % 100 / 12)    
+
 def getDropboxLoc():
     """
     get the drop box location on each computer.
