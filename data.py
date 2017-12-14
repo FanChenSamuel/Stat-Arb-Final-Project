@@ -58,31 +58,31 @@ def cleanCompustat(df):
     df["cusip"] = df["cusip"].apply(killdigit)
     return df
 
-def getFiveFactorData(path = dropboxPath, dataPath = "Validation Data\\F-F_Research_Data_5_Factors_2x3.CSV"):
+def getFiveFactorData(path = dropboxPath, dataPath = os.path.join("Validation Data", "F-F_Research_Data_5_Factors_2x3.CSV")):
     df = pd.read_csv(os.path.join(path, dataPath))
     return cleanFrenchData(df)
 
-def get5IndustryPort(path = dropboxPath, dataPath = "Validation Data\\5_Industry_Portfolios.CSV"):
+def get5IndustryPort(path = dropboxPath, dataPath = os.path.join("Validation Data", "5_Industry_Portfolios.CSV")):
     df = pd.read_csv(os.path.join(path, dataPath))
     return cleanFrenchData(df)
 
-def get10IndustryPort(path = dropboxPath, dataPath = "Validation Data\\10_Industry_Portfolios.CSV"):
+def get10IndustryPort(path = dropboxPath, dataPath = os.path.join("Validation Data", "10_Industry_Portfolios.CSV")):
     df = pd.read_csv(os.path.join(path, dataPath))
     return cleanFrenchData(df)
 
-def get49IndustryPort(path = dropboxPath, dataPath = "Validation Data\\49_Industry_Portfolios.CSV"):
+def get49IndustryPort(path = dropboxPath, dataPath = os.path.join("Validation Data", "49_Industry_Portfolios.CSV")):
     df = pd.read_csv(os.path.join(path, dataPath))
     return cleanFrenchData(df)
 
-def getCRSP(path = dropboxPath, dataPath = "Project Data\\crsp.CSV"): 
+def getCRSP(path = dropboxPath, dataPath = os.path.join("Project Data","crsp.CSV")): 
     df = pd.read_csv(os.path.join(path, dataPath))
     return cleanCRSP(df)
 
-def getCompustat(path = dropboxPath, dataPath = "Project Data\\compustat.CSV"):
+def getCompustat(path = dropboxPath, dataPath = os.path.join("Project Data","compustat.CSV")):
     df = pd.read_csv(os.path.join(path, dataPath))
     return cleanCompustat(df)
 
 def getMergeData():
-    return pd.merge(getCRSP(), getCompustat(), on=['cusip', 'date'])
+    return pd.merge(getCRSP(), getCompustat(), on=['cusip', 'date'], how = "left")
 
 
