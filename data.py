@@ -43,6 +43,11 @@ def cleanCRSP(df):
     df["date"] = df.date // 100
     # change all the column names to lower case
     df.columns = [x.lower() for x in list(df)]
+    # change negative bid, ask, price numbers
+    changeneg = lambda x:np.nan if x <= 0 else x
+    df['bidlo'] = df['bidlo'].apply(changeneg)
+    df['askhi'] = df['askhi'].apply(changeneg)
+    df['prc'] = df['prc'].apply(changeneg)
     return df
 
 def cleanCompustat(df):
@@ -56,6 +61,21 @@ def cleanCompustat(df):
     # delete the last digit of cusip so that it can be merged with crsp data
     killdigit = lambda x:x[:-1]
     df["cusip"] = df["cusip"].apply(killdigit)
+    return df
+
+def cleanMergeData(df):
+    # Remove useless columns
+    df = df.drop(labels = ['permno', 'exchcd', 'ncusip', 'permco', 'spread', 'altprc', 'spread', 'gvkey', 'fyearq', 'fqtr', 'indfmt', 'consol', 'popsrc', 'datafmt', 'tic', 'curcdq', 'datacqtr', 'datafqtr', 'exchg', 'costat', 'mkvaltq', 'naics_y'], axis=1)
+    # change the naics_x column name to naics
+    df= df.rename(columns = {'naics_x': 'naics'})
+    # use cumulative factor to adjust price to adjust price
+    df['prc'] = df['prc']/df['cfacpr']
+    df['shrout'] = df['shrout']/df['cfacshr']
+    df = df.drop(labels = ['cfacpr', 'cfacshr'], axis = 1)
+    # forward fill data
+    df[['atq', 'cshprq','epspxq']] = df[['atq', 'cshprq', 'epspxq']].ffill()
+    # calculate Book to Market ratio
+    # df['b2m'] = df['prc']*df['shrout']/(1000*df['atq'])
     return df
 
 def getFiveFactorData(path = dropboxPath, dataPath = os.path.join("Validation Data", "F-F_Research_Data_5_Factors_2x3.CSV")):
@@ -83,6 +103,10 @@ def getCompustat(path = dropboxPath, dataPath = os.path.join("Project Data","com
     return cleanCompustat(df)
 
 def getMergeData():
-    return pd.merge(getCRSP(), getCompustat(), on=['cusip', 'date'], how = "left")
+    return cleanMergeData(pd.merge(getCRSP(), getCompustat(), on=['cusip', 'date'], how = "left"))
+
+def getCleanData(path = dropboxPath, dataPath = os.path.join("Project Data", "cache_clean_data.CSV")):
+    df = pd.read_csv(os.path.join(path, dataPath))
+    return df
 
 
