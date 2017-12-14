@@ -20,7 +20,6 @@ from Cost import LinearCost, QuadraticCost, ADVCost
 from Filter import long_short_filter, ranking_filter, equal_weight
 from data import getDropboxLoc
 
-import platform
 import os
 
 if __name__ == '__main__':

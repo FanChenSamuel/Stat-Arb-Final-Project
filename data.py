@@ -25,6 +25,24 @@ def getDropboxLoc():
 
 dropboxPath = getDropboxLoc()
 
+def cleanFrenchData(df):
+    # -99.99 is the missing value of the French data
+    df[df < -99] = np.nan
+    return df
+    
 def getFiveFactorData(path = dropboxPath, dataPath = "Validation Data\\F-F_Research_Data_5_Factors_2x3.CSV"):
-    return pd.read_csv(os.path.join(path, dataPath))
+    df = pd.read_csv(os.path.join(path, dataPath))
+    return cleanFrenchData(df)
+
+def get5IndustryPort(path = dropboxPath, dataPath = "Validation Data\\5_Industry_Portfolios.CSV"):
+    df = pd.read_csv(os.path.join(path, dataPath))
+    return cleanFrenchData(df)
+
+def get10IndustryPort(path = dropboxPath, dataPath = "Validation Data\\10_Industry_Portfolios.CSV"):
+    df = pd.read_csv(os.path.join(path, dataPath))
+    return cleanFrenchData(df)
+
+def get49IndustryPort(path = dropboxPath, dataPath = "Validation Data\\49_Industry_Portfolios.CSV"):
+    df = pd.read_csv(os.path.join(path, dataPath))
+    return cleanFrenchData(df)
 
