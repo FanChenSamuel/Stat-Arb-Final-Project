@@ -2,7 +2,7 @@
 """
 Created on Wed Dec 13 18:31:38 2017
 
-@author: chenf
+@author: chenf, linz
 """
 
 import numpy  as np
@@ -45,4 +45,13 @@ def get10IndustryPort(path = dropboxPath, dataPath = "Validation Data\\10_Indust
 def get49IndustryPort(path = dropboxPath, dataPath = "Validation Data\\49_Industry_Portfolios.CSV"):
     df = pd.read_csv(os.path.join(path, dataPath))
     return cleanFrenchData(df)
+
+def getCRSP(path = dropboxPath, dataPath = "Project Data\\crsp.CSV"): 
+    df = pd.read_csv(os.path.join(path, dataPath))
+    return cleanFrenchData(df)
+
+def getCompustat(path = dropboxPath, dataPath = "Project Data\\compustat.CSV"):
+    df = pd.read_csv(os.path.join(path, dataPath))
+    return cleanFrenchData(df)
+
 
