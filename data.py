@@ -94,6 +94,10 @@ def get49IndustryPort(path = dropboxPath, dataPath = os.path.join("Validation Da
     df = pd.read_csv(os.path.join(path, dataPath))
     return cleanFrenchData(df)
 
+def getSP500Data(path = dropboxPath, dataPath = os.path.join("Validation Data", "SP500.csv")):
+    df = pd.read_csv(os.path.join(path, dataPath))
+    return df
+
 def getCRSP(path = dropboxPath, dataPath = os.path.join("Project Data","crsp.CSV")): 
     df = pd.read_csv(os.path.join(path, dataPath))
     return cleanCRSP(df)

@@ -6,6 +6,7 @@ Statistical Arbitrage Team Project
 """
 
 from data import getFiveFactorData, get5IndustryPort, get10IndustryPort, get49IndustryPort, convertMonthToContinuous
+from Filter import long_short_filter, ranking_filter, long_ranking_filter
 import statsmodels.api as sm
 import pandas as pd
 import numpy  as np
@@ -108,6 +109,32 @@ def regressFactorModel(factorDf: pd.DataFrame, indDf: pd.DataFrame, rfDf: pd.Dat
                             
     return regOutput
 
+def validateInitStrategy(signal, portReturn, long_short = True, selection = ranking_filter):
+    """
+    Use the alpha signal to generate the portfolio return 
+    """
+    portReturn.index = convertMonthToContinuous(portReturn.Month)
+    portReturn = portReturn.drop(["Month"], axis = 1)
+    nPort = len(signal.columns)
+    
+    firstMonthIdx = np.min(np.where(np.sum(pd.isnull(signal), axis = 1) < nPort - 0.01))
+    firstMonth    = signal.index[firstMonthIdx]
+    
+    signal = signal[signal.index >= firstMonth]
+    signal = signal.astype(np.float64)
+    portReturn = portReturn[portReturn.index >= firstMonth]
+    
+    portValue = [1]
+    curValue  = 1
+    
+    for i in range(len(signal) - 1):
+        temp_pos = selection(signal.iloc[i])
+        temp_ret = np.dot(temp_pos , portReturn.iloc[i + 1])
+        curValue *= 1 + (temp_ret / 100)
+        portValue.append(curValue)
+    
+    return pd.DataFrame(portValue, index = signal.index)
+
 if __name__ == "__main__":
     fiveFactor = getFiveFactorData()
     ind_5      = get5IndustryPort()
@@ -124,14 +151,21 @@ if __name__ == "__main__":
     
     ind_10_alpha = ind_10_factor['Alpha']
     ind_10_alpha.index = convertMonthToContinuous(ind_10_alpha.index)
+    ind_10_rank = ind_10_alpha.rank(axis = 1, method = "max")
+    ind_10_rank.plot.area(stacked=False, ylim = (1,10), figsize = (12,8))
+    # Ranking plot
     
     plt.figure(figsize = (8,6))
-    ax1 = ind_10_alpha.iloc[:, 0:5].plot()
+#    ax1 = ind_10_alpha.iloc[:, 0:5].plot()
+    ax1 = ind_10_alpha.plot()
     lines, legends = ax1.get_legend_handles_labels()
     
-    des_5=descStatistics(ind_5,fiveFactor[['Month', 'RF']])
+    des_5 =descStatistics(ind_5,fiveFactor[['Month', 'RF']])
     des_10=descStatistics(ind_10,fiveFactor[['Month', 'RF']])
     des_49=descStatistics(ind_49,fiveFactor[['Month', 'RF']])
+    
+    res = validateInitStrategy(ind_10_alpha, ind_10, selection = long_ranking_filter)
+    
     
     
     
