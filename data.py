@@ -34,7 +34,16 @@ def cleanFrenchData(df):
     # -99.99 is the missing value of the French data
     df[df < -99] = np.nan
     return df
+
+def cleanCRSP(df):
+    # all the codes that will clean crsp go here
     
+    return df
+
+def cleanCompustat(df):
+    # all the codes that will clean compustat go here
+    return df
+
 def getFiveFactorData(path = dropboxPath, dataPath = "Validation Data\\F-F_Research_Data_5_Factors_2x3.CSV"):
     df = pd.read_csv(os.path.join(path, dataPath))
     return cleanFrenchData(df)
@@ -53,10 +62,11 @@ def get49IndustryPort(path = dropboxPath, dataPath = "Validation Data\\49_Indust
 
 def getCRSP(path = dropboxPath, dataPath = "Project Data\\crsp.CSV"): 
     df = pd.read_csv(os.path.join(path, dataPath))
-    return cleanFrenchData(df)
+    return cleanCRSP(df)
 
 def getCompustat(path = dropboxPath, dataPath = "Project Data\\compustat.CSV"):
     df = pd.read_csv(os.path.join(path, dataPath))
-    return cleanFrenchData(df)
+    return cleanCompustat(df)
+
 
 
