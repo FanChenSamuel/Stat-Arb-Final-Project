@@ -10,11 +10,35 @@ import statsmodels.api as sm
 import pandas as pd
 import numpy  as np
 import matplotlib.pyplot as plt
+from scipy import stats
+from collections import OrderedDict
+
+#function that extracts the p value for skew test 
+def Skewtest(array):
+    return stats.skewtest(array)[1]
+
+#function that extracts the p value for kurtosis test
+def Kurtotest(array):
+    return stats.kurtosistest(array)[1]
 
 ## Missing Descriptive statistics
-def descStatistics(indDf: pd.DataFrame, rfDf: pd.DataFrame):
-    # Data
-    pass
+def descStatistics(indDf: pd.DataFrame, rfDf: pd.DataFrame): 
+    indName=indDf.columns[1:]
+    '''merge industry data with risk free data by month'''
+    mergeDf=pd.merge(indDf, rfDf, on = ["Month"])
+    '''excess return data'''
+    excessRet=mergeDf[indName].subtract(mergeDf['RF'], axis = 0)
+    '''compute descriptive stats'''
+    meanret=excessRet.apply(np.mean,axis=0)
+    std=excessRet.apply(np.std,axis=0)
+    skew=excessRet.apply(stats.skew,axis=0)
+    skewpvalue=excessRet.apply(Skewtest,axis=0)
+    kurto=excessRet.apply(stats.kurtosis,axis=0)
+    kurtopvalue=excessRet.apply(Kurtotest,axis=0)
+    return pd.DataFrame(OrderedDict((("Mean Return",meanret),("Standard Deviation",std),
+                         ("Skew",skew),("Skew-pvalue",skewpvalue),
+                         ("Kurtosis",kurto),("Kurtosis-pvalue",kurtopvalue))))
+    
 
 def regressFactorModel(factorDf: pd.DataFrame, indDf: pd.DataFrame, rfDf: pd.DataFrame, period = 36, min_period = 12):
     """
@@ -105,6 +129,9 @@ if __name__ == "__main__":
     ax1 = ind_10_alpha.iloc[:, 0:5].plot()
     lines, legends = ax1.get_legend_handles_labels()
     
+    des_5=descStatistics(ind_5,fiveFactor[['Month', 'RF']])
+    des_10=descStatistics(ind_10,fiveFactor[['Month', 'RF']])
+    des_49=descStatistics(ind_49,fiveFactor[['Month', 'RF']])
     
     
     
