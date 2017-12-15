@@ -189,6 +189,8 @@ if __name__ == "__main__":
     res["Benchmark"] = res.Close / res.Close.values[0]
     
     res[["Portfolio Value", "Benchmark"]].plot()    
+    plt.title("Sector Rotation Strategy vs S&P 500 Index Performance")
+    plt.savefig("strategyVSSP.png")
     
     
     
