@@ -22,7 +22,7 @@ from data import getDropboxLoc
 
 import os
 
-if __name__ == '__main__':
+def billZhou():
     
     dropboxLoc = getDropboxLoc()
     # cap = "small"
