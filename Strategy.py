@@ -58,79 +58,79 @@ class SectorRotationStrategy:
         self.shares = pd.DataFrame(data=0., columns=list(self.price), index=list(self.price.index))
         self.weights = pd.DataFrame(data=0., columns=list(self.price), index=list(self.price.index))
         self.value = pd.Series(data=0., index=list(self.price.index))            # value of all current portfolios
-#        bid = np.zeros(self.price.shape[1])
-#        ask = np.zeros(self.price.shape[1])
-#        price = np.zeros(self.price.shape[1])
+        bid = np.zeros(self.price.shape[1])
+        ask = np.zeros(self.price.shape[1])
+        price = np.zeros(self.price.shape[1])
         nPeriod = self.price.shape[0]
         
         for i in range(self.forming, nPeriod):
-            bid_price = self.bid.iloc[i]
-            ask_price = self.ask.iloc[i]
-            cur_price = self.price.iloc[i]            
-            
-            cur_score = self.score.iloc[i]
-            cur_sec_score = self.second_score.iloc[i]
-            cur_ind   = self.industry.iloc[i]
-            
-            pos = self.filtr(cur_score, cur_sec_score, cur_ind)
-            
-            if i <= (nPeriod - self.holding):
-                values_to_open = pos * self.capital / self.holding
-                shares_to_open = ((values_to_open*(values_to_open>0)/ask_price).replace(np.nan,0)
-                                + (values_to_open*(values_to_open<0)/bid_price).replace(np.nan,0))
-            else:
-                shares_to_open = 0
-                
-            if i >= (self.forming + self.holding - 1):
-                shares_to_close = self.shares.iloc[i - self.holding]
-            else:
-                shares_to_close= 0
-                
-            reposition_shares = (shares_to_open - shares_to_close).replace(np.nan, 0)
-            reposition = ((reposition_shares[reposition_shares>0] * ask_price).replace(np.nan,0)
-                 + (reposition_shares[reposition_shares<0] * bid_price).replace(np.nan,0))
-            
-            t_cost = self.cost_model.calculate_cost(np.abs(reposition))
-            self.cash.iloc[i] = self.cash.iloc[i - 1] - sum(reposition + t_cost)
-            self.shares.iloc[i] = shares_to_open
-            total_shares = self.shares.iloc[max((i-self.holding+1),0):(i+1)].sum()
-            self.value.iloc[i] = self.cash.iloc[i] + sum((total_shares*cur_price).replace(np.nan, 0))
-            
-#            # print(self.momentum.index[i])
-#            bid = bid * (np.isnan(self.bid.iloc[i])) + self.bid.iloc[i] * (~np.isnan(self.bid.iloc[i]))
-#            ask = ask * (np.isnan(self.ask.iloc[i])) + self.ask.iloc[i] * (~np.isnan(self.ask.iloc[i]))
-#            price = price * (np.isnan(self.price.iloc[i])) + self.price.iloc[i] * (~np.isnan(self.price.iloc[i]))
-#            print(i)
-#            # close old position
-#            if i >= self.forming + self.holding - 1:
-#                shares_to_close = np.nan_to_num(self.shares.iloc[i - self.holding])
-#            else:
-#                shares_to_close = 0
-#            # open new position, stop building new position when holding period < time left
-#            if i <= self.price.shape[0] - self.holding and (~np.isnan(self.momentum.iloc[i])).any():
-#                weights = self.filtr(self.score.iloc[i], self.second_score.iloc[i], self.industry.iloc[i])
-#                print(np.nansum(weights))
-#                values_to_open = np.nan_to_num( weights * self.capital / self.holding)
-#                shares_to_open = np.nan_to_num(values_to_open * (values_to_open>0) / ask
-#                                               + values_to_open * (values_to_open<0) / bid)
+#            bid_price = self.bid.iloc[i]
+#            ask_price = self.ask.iloc[i]
+#            cur_price = self.price.iloc[i]            
+#            
+#            cur_score = self.score.iloc[i]
+#            cur_sec_score = self.second_score.iloc[i]
+#            cur_ind   = self.industry.iloc[i]
+#            
+#            pos = self.filtr(cur_score, cur_sec_score, cur_ind)
+#            
+#            if i <= (nPeriod - self.holding):
+#                values_to_open = pos * self.capital / self.holding
+#                shares_to_open = ((values_to_open*(values_to_open>0)/ask_price).replace(np.nan,0)
+#                                + (values_to_open*(values_to_open<0)/bid_price).replace(np.nan,0))
 #            else:
 #                shares_to_open = 0
-#                values_to_open = 0
+#                
+#            if i >= (self.forming + self.holding - 1):
+#                shares_to_close = self.shares.iloc[i - self.holding]
+#            else:
+#                shares_to_close= 0
+#                
+#            reposition_shares = (shares_to_open - shares_to_close).replace(np.nan, 0)
+#            reposition = ((reposition_shares[reposition_shares>0] * ask_price).replace(np.nan,0)
+#                 + (reposition_shares[reposition_shares<0] * bid_price).replace(np.nan,0))
 #            
-#            # reposition is actual value of portfolio that need to be traded
-#            reposition_shares = shares_to_open - shares_to_close
-#            reposition = np.nan_to_num(reposition_shares * (reposition_shares>0) * ask
-#                                       + reposition_shares * (reposition_shares<0) * bid)
-#            transaction_cost = self.cost_model.calculate_cost(np.abs(reposition))
-#            # current cash = previous cash + proceed from closing - cost to open - transaction
-#            self.cash[i] = self.cash[i-1] - np.nansum(reposition + transaction_cost)
+#            t_cost = self.cost_model.calculate_cost(np.abs(reposition))
+#            self.cash.iloc[i] = self.cash.iloc[i - 1] - sum(reposition + t_cost)
 #            self.shares.iloc[i] = shares_to_open
-#            self.weights.iloc[i] = values_to_open
-#            total_shares = self.shares.iloc[i-self.holding+1:i+1].sum(axis=0)
-#            # this is the value of portfolio if we close out everything now
-#            self.value.iloc[i] = np.sum(total_shares*(total_shares>0)*bid
-#                                        + total_shares*(total_shares<0)*ask) + self.cash[i]
-#
+#            total_shares = self.shares.iloc[max((i-self.holding+1),0):(i+1)].sum()
+#            self.value.iloc[i] = self.cash.iloc[i] + sum((total_shares*cur_price).replace(np.nan, 0))
+            
+            # print(self.momentum.index[i])
+            bid = bid * (np.isnan(self.bid.iloc[i])) + self.bid.iloc[i] * (~np.isnan(self.bid.iloc[i]))
+            ask = ask * (np.isnan(self.ask.iloc[i])) + self.ask.iloc[i] * (~np.isnan(self.ask.iloc[i]))
+            price = price * (np.isnan(self.price.iloc[i])) + self.price.iloc[i] * (~np.isnan(self.price.iloc[i]))
+            print(i)
+            # close old position
+            if i >= self.forming + self.holding - 1:
+                shares_to_close = np.nan_to_num(self.shares.iloc[i - self.holding])
+            else:
+                shares_to_close = 0
+            # open new position, stop building new position when holding period < time left
+            if i <= self.price.shape[0] - self.holding and (~np.isnan(self.momentum.iloc[i])).any():
+                weights = self.filtr(self.score.iloc[i], self.second_score.iloc[i], self.industry.iloc[i])
+                print(np.nansum(weights))
+                values_to_open = np.nan_to_num( weights * self.capital / self.holding)
+                shares_to_open = np.nan_to_num(values_to_open * (values_to_open>0) / ask
+                                               + values_to_open * (values_to_open<0) / bid)
+            else:
+                shares_to_open = 0
+                values_to_open = 0
+            
+            # reposition is actual value of portfolio that need to be traded
+            reposition_shares = shares_to_open - shares_to_close
+            reposition = np.nan_to_num(reposition_shares * (reposition_shares>0) * ask
+                                       + reposition_shares * (reposition_shares<0) * bid)
+            transaction_cost = self.cost_model.calculate_cost(np.abs(reposition))
+            # current cash = previous cash + proceed from closing - cost to open - transaction
+            self.cash[i] = self.cash[i-1] - np.nansum(reposition + transaction_cost)
+            self.shares.iloc[i] = shares_to_open
+            self.weights.iloc[i] = values_to_open
+            total_shares = self.shares.iloc[i-self.holding+1:i+1].sum(axis=0)
+            # this is the value of portfolio if we close out everything now
+            self.value.iloc[i] = np.sum(total_shares*(total_shares>0)*bid
+                                        + total_shares*(total_shares<0)*ask) + self.cash[i]
+
 #    def run_without_bid_ask(self):
 #        self.cash = pd.Series(data=0., index=list(self.price.index))  # assume all strategy have zero value to set up
 #        self.shares = pd.DataFrame(data=0., columns=list(self.price), index=list(self.price.index))

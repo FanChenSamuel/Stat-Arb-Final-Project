@@ -9,7 +9,7 @@ strategy-framework in this case
 """
 
 
-#import numpy as np
+import numpy as np
 import pandas as pd
 
 import matplotlib.pyplot as plt
@@ -68,5 +68,7 @@ if __name__ == "__main__":
     lin_cost = LinearCost(0.001)
     strat = SectorRotationStrategy(price, bid, ask, alpha, industry, 6, 1, long_ranking_filter, equal_weight, lin_cost, ind_list)
     strat.run()
+    
+    plt.plot(strat.value)
     
     print("Mission Complete!")
