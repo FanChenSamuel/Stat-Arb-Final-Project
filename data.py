@@ -11,6 +11,8 @@ import platform
 import os
 from datetime import timedelta
 
+# MOM_LAG = 4
+
 def convertMonthToContinuous(monthIndex):
     return (monthIndex // 100) + (monthIndex % 100 / 12)    
 
@@ -76,7 +78,9 @@ def cleanMergeData(df):
     # forward fill data
     df[['atq', 'cshprq','epspxq']] = df[['atq', 'cshprq', 'epspxq']].ffill()
     # calculate Book to Market ratio
-    # df['b2m'] = df['prc']*df['shrout']/(1000*df['atq'])
+    df['b2m'] = df['prc']*df['shrout']/(1000*df['atq'])
+    # calculate the momentum measure as the return from the previous month minus MOM_LAG numbers of months
+    df['mom'] = df['prc']
     return df
 
 def getFiveFactorData(path = dropboxPath, dataPath = os.path.join("Validation Data", "F-F_Research_Data_5_Factors_2x3.CSV")):
@@ -114,4 +118,9 @@ def getMergeData():
 
 def getCleanData(path = dropboxPath, dataPath = os.path.join("Project Data", "cache_clean_data.CSV")):
     df = pd.read_csv(os.path.join(path, dataPath))
+    return df
+
+# Input a vector of NAICS codes
+# The function will map the codes to Fama French
+def mapSector(df):
     return df
