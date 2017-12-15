@@ -58,7 +58,7 @@ def cleanCompustat(df):
     df = df[pd.notnull(df['naics'])]
     df = df[pd.notnull(df['cusip'])]
     # change data format from yyyymmdd to yyyymm
-    df["datadate"] = df.datadate // 100
+    df.datadate = df.datadate // 100
     # change the datadate column name to date
     df = df.rename(columns = {'datadate':'date'})
     # delete the last digit of cusip so that it can be merged with crsp data
@@ -72,8 +72,10 @@ def cleanMergeData(df):
     # change the naics_x column name to naics
     df= df.rename(columns = {'naics_x': 'naics'})
     # use cumulative factor to adjust price to adjust price
-    df['prc'] = df['prc']/df['cfacpr']
-    df['shrout'] = df['shrout']/df['cfacshr']
+    df.prc /= df.cfacpr
+    df.bidlo  /= df.cfacpr
+    df.askhi  /= df.cfacpr
+    df.shrout /= df.cfacshr
     df = df.drop(labels = ['cfacpr', 'cfacshr'], axis = 1)
     # forward fill data
     df[['atq', 'cshprq','epspxq']] = df[['atq', 'cshprq', 'epspxq']].ffill()
