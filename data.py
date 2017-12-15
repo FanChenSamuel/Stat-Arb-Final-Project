@@ -80,7 +80,9 @@ def cleanMergeData(df):
     # calculate Book to Market ratio
     df['b2m'] = df['prc']*df['shrout']/(1000*df['atq'])
     # calculate the momentum measure as the return from the previous month minus MOM_LAG numbers of months
-    # df['mom'] = df['prc']
+    # df['mom'] = 
+    # map all the naics codes to fama french industry
+    df = mapSector(df)
     return df
 
 def getFiveFactorData(path = dropboxPath, dataPath = os.path.join("Validation Data", "F-F_Research_Data_5_Factors_2x3.CSV")):
@@ -123,4 +125,112 @@ def getCleanData(path = dropboxPath, dataPath = os.path.join("Project Data", "ca
 # Input a vector of NAICS codes
 # The function will map the codes to Fama French
 def mapSector(df):
+    for i in range(len(df["naics"])):
+        f4 = int(str(df["naics"][i])[:4])
+        ind = ""
+        if 100 <= f4 <= 999:
+            ind = "NoDur"
+        elif 2000 <= f4 <= 2399:
+            ind = "NoDur"
+        elif 2700 <= f4 <= 2749:
+            ind = "NoDur"
+        elif 2770 <= f4 <= 2799:
+            ind = "NoDur"
+        elif 3100 <= f4 <= 3199:
+            ind = "NoDur"
+        elif 3940 <= f4 <= 3989: 
+            ind = "NoDur"
+        elif 2500 <= f4 <= 2519:
+            ind = "Durbl"
+        elif 2590 <= f4 <= 2599:
+            ind = "Durbl"
+        elif 3630 <= f4 <= 3659:
+            ind = "Durbl"
+        elif 3710 <= f4 <= 3711: 
+            ind = "Durbl"
+        elif 3714 <= f4 <= 3714:
+            ind = "Durbl"
+        elif 3716 <= f4 <= 3716:
+            ind = "Durbl"
+        elif 3750 <= f4 <= 3751: 
+            ind = "Durbl"
+        elif 3792 <= f4 <= 3792: 
+            ind = "Durbl"
+        elif 3900 <= f4 <= 3939:
+            ind = "Durbl"
+        elif 3990 <= f4 <= 3999: 
+            ind = "Durbl"
+        elif 2520 <= f4 <= 2589:
+            ind = "Manuf"
+        elif 2600 <= f4 <= 2699:
+            ind = "Manuf"
+        elif 2750 <= f4 <= 2769:
+            ind = "Manuf"
+        elif 2800 <= f4 <= 2829: 
+            ind = "Manuf"
+        elif 2840 <= f4 <= 2899: 
+            ind = "Manuf"
+        elif 3000 <= f4 <= 3099:
+            ind = "Manuf"
+        elif 3200 <= f4 <= 3569:
+            ind = "Manuf"
+        elif 3580 <= f4 <= 3621: 
+            ind = "Manuf"
+        elif 3623 <= f4 <= 3629: 
+            ind = "Manuf"
+        elif 3700 <= f4 <= 3709: 
+            ind = "Manuf"
+        elif 3712 <= f4 <= 3713: 
+            ind = "Manuf"
+        elif 3715 <= f4 <= 3715:
+            ind = "Manuf"
+        elif 3717 <= f4 <= 3749: 
+            ind = "Manuf"
+        elif 3752 <= f4 <= 3791:
+            ind = "Manuf"
+        elif 3793 <= f4 <= 3799:
+            ind = "Manuf"
+        elif 3860 <= f4 <= 3899:
+            ind = "Manuf"
+        elif 1200 <= f4 <= 1399: 
+            ind = "Enrgy"
+        elif 2900 <= f4 <= 2999:
+            ind = "Enrgy"
+        elif 3570 <= f4 <= 3579:
+            ind = "HiTec"
+        elif 3622 <= f4 <= 3622: 
+            ind = "HiTec"
+        elif 3660 <= f4 <= 3692: 
+            ind = "HiTec"
+        elif 3694 <= f4 <= 3699:
+            ind = "HiTec"
+        elif 3810 <= f4 <= 3839: 
+            ind = "HiTec"
+        elif 7370 <= f4 <= 7379: 
+            ind = "HiTec"
+        elif 7391 <= f4 <= 7391:
+            ind = "HiTec"
+        elif 8730 <= f4 <= 8734:
+            ind = "HiTec"
+        elif 4800 <= f4 <= 4899:
+            ind = "Telcm"
+        elif 5000 <= f4 <= 5999:
+            ind = "Shops"
+        elif 7200 <= f4 <= 7299:
+            ind = "Shops"
+        elif 7600 <= f4 <= 7699:
+            ind = "Shops"
+        elif 2830 <= f4 <= 2839:
+            ind = "Hlth"
+        elif 3693 <= f4 <= 3693:
+            ind = "Hlth"
+        elif 3840 <= f4 <= 3859: 
+            ind = "Hlth"
+        elif 8000 <= f4 <= 8099:
+            ind = "Hlth"
+        elif 4900 <= f4 <= 4949: 
+            ind = "Hlth"
+        else:
+            ind = "Other"
+        df["naics"][i]=ind 
     return df
