@@ -66,7 +66,7 @@ if __name__ == "__main__":
     industry = pd.read_pickle("industry.pkl").reset_index(drop = True)
     
     lin_cost = LinearCost(0.001)
-    strat = SectorRotationStrategy(price, bid, ask, alpha, industry, 6, 1, 0, long_ranking_filter, equal_weight, lin_cost, ind_list)
+    strat = SectorRotationStrategy(price, bid, ask, alpha, industry, 6, 1, long_ranking_filter, equal_weight, lin_cost, ind_list)
     strat.run()
     
     print("Mission Complete!")
