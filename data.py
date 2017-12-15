@@ -9,6 +9,7 @@ import numpy  as np
 import pandas as pd
 import platform
 import os
+from datetime import timedelta
 
 # MOM_LAG = 4
 
@@ -97,6 +98,12 @@ def get10IndustryPort(path = dropboxPath, dataPath = os.path.join("Validation Da
 def get49IndustryPort(path = dropboxPath, dataPath = os.path.join("Validation Data", "49_Industry_Portfolios.CSV")):
     df = pd.read_csv(os.path.join(path, dataPath))
     return cleanFrenchData(df)
+
+def getSP500Data(path = dropboxPath, dataPath = os.path.join("Validation Data", "SP500.csv")):
+    df = pd.read_csv(os.path.join(path, dataPath))
+    df["Month"] = df.Date.apply(pd.Timestamp) - timedelta(days = 1)
+    df.Month = df.Month.astype(str).apply(lambda x: int(x[0:4] + x[5:7]))
+    return df
 
 def getCRSP(path = dropboxPath, dataPath = os.path.join("Project Data","crsp.CSV")): 
     df = pd.read_csv(os.path.join(path, dataPath))
