@@ -43,14 +43,14 @@ def cleanCRSP(df):
     # clear all the data without NAICS codes
     df = df[pd.notnull(df['NAICS'])]
     # change all date format from yyyymmdd to yyyymm
-    df["date"] = df.date // 100
+    df.date = df.date // 100
     # change all the column names to lower case
     df.columns = [x.lower() for x in list(df)]
     # change negative bid, ask, price numbers
     changeneg = lambda x:np.nan if x <= 0 else x
-    df['bidlo'] = df['bidlo'].apply(changeneg)
-    df['askhi'] = df['askhi'].apply(changeneg)
-    df['prc'] = df['prc'].apply(changeneg)
+    df.bidlo = df.bidlo.apply(changeneg)
+    df.askhi = df.askhi.apply(changeneg)
+    df.prc = df.prc.apply(changeneg)
     return df
 
 def cleanCompustat(df):
@@ -58,7 +58,7 @@ def cleanCompustat(df):
     df = df[pd.notnull(df['naics'])]
     df = df[pd.notnull(df['cusip'])]
     # change data format from yyyymmdd to yyyymm
-    df["datadate"] = df.datadate // 100
+    df.datadate = df.datadate // 100
     # change the datadate column name to date
     df = df.rename(columns = {'datadate':'date'})
     # delete the last digit of cusip so that it can be merged with crsp data
@@ -72,8 +72,10 @@ def cleanMergeData(df):
     # change the naics_x column name to naics
     df= df.rename(columns = {'naics_x': 'naics'})
     # use cumulative factor to adjust price to adjust price
-    df['prc'] = df['prc']/df['cfacpr']
-    df['shrout'] = df['shrout']/df['cfacshr']
+    df.prc /= df.cfacpr
+    df.bidlo  /= df.cfacpr
+    df.askhi  /= df.cfacpr
+    df.shrout /= df.cfacshr
     df = df.drop(labels = ['cfacpr', 'cfacshr'], axis = 1)
     # forward fill data
     df[['atq', 'cshprq','epspxq']] = df[['atq', 'cshprq', 'epspxq']].ffill()
@@ -82,7 +84,7 @@ def cleanMergeData(df):
     # calculate the momentum measure as the return from the previous month minus MOM_LAG numbers of months
     # df['mom'] = 
     # map all the naics codes to fama french industry
-    df = mapSector(df)
+#    df = mapSector(df)
     return df
 
 def getFiveFactorData(path = dropboxPath, dataPath = os.path.join("Validation Data", "F-F_Research_Data_5_Factors_2x3.CSV")):
@@ -107,6 +109,10 @@ def getSP500Data(path = dropboxPath, dataPath = os.path.join("Validation Data", 
     df.Month = df.Month.astype(str).apply(lambda x: int(x[0:4] + x[5:7]))
     return df
 
+def getSIC(path = dropboxPath, dataPath = os.path.join("Project Data","sic_code.csv") ):
+    df = pd.read_csv(os.path.join(path, dataPath))
+    return df
+
 def getCRSP(path = dropboxPath, dataPath = os.path.join("Project Data","crsp.CSV")): 
     df = pd.read_csv(os.path.join(path, dataPath))
     return cleanCRSP(df)
@@ -116,7 +122,18 @@ def getCompustat(path = dropboxPath, dataPath = os.path.join("Project Data","com
     return cleanCompustat(df)
 
 def getMergeData():
-    return cleanMergeData(pd.merge(getCRSP(), getCompustat(), on=['cusip', 'date'], how = "left"))
+    cleanData = cleanMergeData(pd.merge(getCRSP(), getCompustat(), on=['cusip', 'date'], how = "left"))
+    sicDf  = getSIC()
+    sicDf.date = sicDf.date // 100
+    cleanData=  pd.merge(cleanData, sicDf[["date", "CUSIP", "SICCD"]].rename(columns = {"CUSIP": "cusip"}), on = ["cusip", "date"], how = "left")
+    def convertSIC(x):
+        try:
+            return int(x)
+        except:
+            return np.nan
+    cleanData.SICCD = cleanData.SICCD.apply(convertSIC)
+    cleanData = mapSector(cleanData)
+    return cleanData
 
 def getCleanData(path = dropboxPath, dataPath = os.path.join("Project Data", "cache_clean_data.CSV")):
     df = pd.read_csv(os.path.join(path, dataPath))
@@ -125,11 +142,16 @@ def getCleanData(path = dropboxPath, dataPath = os.path.join("Project Data", "ca
 # Input a vector of NAICS codes
 # The function will map the codes to Fama French
 def mapSector(df):
+<<<<<<< HEAD
     for i in range(len(df["naics"])):
         if i % 1000 == 0:
             print(i)
         f4 = int(str(df["naics"][i])[:4])
         ind = ""
+=======
+
+    def findSector(f4):
+>>>>>>> ca5b0fb45614a76ae850a3c288b1f3052412b036
         if 100 <= f4 <= 999:
             ind = "NoDur"
         elif 2000 <= f4 <= 2399:
@@ -231,9 +253,17 @@ def mapSector(df):
         elif 8000 <= f4 <= 8099:
             ind = "Hlth"
         elif 4900 <= f4 <= 4949: 
-            ind = "Hlth"
+            ind = "Utils"
         else:
+<<<<<<< HEAD
             ind = "Other"
         df["naics"][i]=ind 
     df= df.rename(columns = {'naics': 'ffind'})
+=======
+            ind = "Other"        
+        return ind
+    
+    df["Industry"] = df.SICCD.apply(findSector)        
+    
+>>>>>>> ca5b0fb45614a76ae850a3c288b1f3052412b036
     return df

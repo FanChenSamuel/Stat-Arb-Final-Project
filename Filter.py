@@ -34,12 +34,14 @@ def ranking_filter(score):
     return pos
 
 def long_ranking_filter(score):
-    ranks = mstats.rankdata(np.ma.masked_invalid(score))
+    try:
+        ranks = mstats.rankdata(np.ma.masked_invalid(score))
+    except:
+        return score * 0 + 1 / len(score)
     ranks[ranks == 0] = np.nan
     pos = np.nan_to_num( ranks/ np.nansum(ranks))
     return pos   
     
-
 def equal_weight(score):
     return (~np.isnan(score)) / np.sum(~np.isnan(score))
 
