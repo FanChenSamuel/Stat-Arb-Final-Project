@@ -43,14 +43,14 @@ def cleanCRSP(df):
     # clear all the data without NAICS codes
     df = df[pd.notnull(df['NAICS'])]
     # change all date format from yyyymmdd to yyyymm
-    df["date"] = df.date // 100
+    df.date = df.date // 100
     # change all the column names to lower case
     df.columns = [x.lower() for x in list(df)]
     # change negative bid, ask, price numbers
     changeneg = lambda x:np.nan if x <= 0 else x
-    df['bidlo'] = df['bidlo'].apply(changeneg)
-    df['askhi'] = df['askhi'].apply(changeneg)
-    df['prc'] = df['prc'].apply(changeneg)
+    df.bidlo = df.bidlo.apply(changeneg)
+    df.askhi = df.askhi.apply(changeneg)
+    df.prc = df.prc.apply(changeneg)
     return df
 
 def cleanCompustat(df):
@@ -84,7 +84,7 @@ def cleanMergeData(df):
     # calculate the momentum measure as the return from the previous month minus MOM_LAG numbers of months
     # df['mom'] = 
     # map all the naics codes to fama french industry
-    df = mapSector(df)
+#    df = mapSector(df)
     return df
 
 def getFiveFactorData(path = dropboxPath, dataPath = os.path.join("Validation Data", "F-F_Research_Data_5_Factors_2x3.CSV")):
@@ -109,6 +109,10 @@ def getSP500Data(path = dropboxPath, dataPath = os.path.join("Validation Data", 
     df.Month = df.Month.astype(str).apply(lambda x: int(x[0:4] + x[5:7]))
     return df
 
+def getSIC(path = dropboxPath, dataPath = os.path.join("Project Data","sic_code.csv") ):
+    df = pd.read_csv(os.path.join(path, dataPath))
+    return df
+
 def getCRSP(path = dropboxPath, dataPath = os.path.join("Project Data","crsp.CSV")): 
     df = pd.read_csv(os.path.join(path, dataPath))
     return cleanCRSP(df)
@@ -118,7 +122,18 @@ def getCompustat(path = dropboxPath, dataPath = os.path.join("Project Data","com
     return cleanCompustat(df)
 
 def getMergeData():
-    return cleanMergeData(pd.merge(getCRSP(), getCompustat(), on=['cusip', 'date'], how = "left"))
+    cleanData = cleanMergeData(pd.merge(getCRSP(), getCompustat(), on=['cusip', 'date'], how = "left"))
+    sicDf  = getSIC()
+    sicDf.date = sicDf.date // 100
+    cleanData=  pd.merge(cleanData, sicDf[["date", "CUSIP", "SICCD"]].rename(columns = {"CUSIP": "cusip"}), on = ["cusip", "date"], how = "left")
+    def convertSIC(x):
+        try:
+            return int(x)
+        except:
+            return np.nan
+    cleanData.SICCD = cleanData.SICCD.apply(convertSIC)
+    cleanData = mapSector(cleanData)
+    return cleanData
 
 def getCleanData(path = dropboxPath, dataPath = os.path.join("Project Data", "cache_clean_data.CSV")):
     df = pd.read_csv(os.path.join(path, dataPath))
@@ -127,7 +142,7 @@ def getCleanData(path = dropboxPath, dataPath = os.path.join("Project Data", "ca
 # Input a vector of NAICS codes
 # The function will map the codes to Fama French
 def mapSector(df):
-    df["naics4"] = df.naics // 100
+
     def findSector(f4):
         if 100 <= f4 <= 999:
             ind = "NoDur"
@@ -230,11 +245,11 @@ def mapSector(df):
         elif 8000 <= f4 <= 8099:
             ind = "Hlth"
         elif 4900 <= f4 <= 4949: 
-            ind = "Hlth"
+            ind = "Utils"
         else:
             ind = "Other"        
         return ind
     
-    df["Industry"] = df.naics4.apply(findSector)        
+    df["Industry"] = df.SICCD.apply(findSector)        
     
     return df
