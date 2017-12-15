@@ -5,7 +5,13 @@ Statistical Arbitrage Team Project
 @author: Fan Chen, Zhijiang Huang, Fei Li, Zhixian Lin
 """
 
-from data import getFiveFactorData, get5IndustryPort, get10IndustryPort, get49IndustryPort, convertMonthToContinuous
+from data import (getFiveFactorData, 
+                 get5IndustryPort, 
+                 get10IndustryPort, 
+                 get49IndustryPort, 
+                 convertMonthToContinuous,
+                 getSP500Data)
+                 
 from Filter import long_short_filter, ranking_filter, long_ranking_filter
 import statsmodels.api as sm
 import pandas as pd
@@ -129,11 +135,12 @@ def validateInitStrategy(signal, portReturn, long_short = True, selection = rank
     
     for i in range(len(signal) - 1):
         temp_pos = selection(signal.iloc[i])
+#        print(np.sum(temp_pos))
         temp_ret = np.dot(temp_pos , portReturn.iloc[i + 1])
         curValue *= 1 + (temp_ret / 100)
         portValue.append(curValue)
     
-    return pd.DataFrame(portValue, index = signal.index)
+    return pd.DataFrame({"Portfolio Value":portValue}, index = signal.index)
 
 if __name__ == "__main__":
     fiveFactor = getFiveFactorData()
@@ -151,8 +158,18 @@ if __name__ == "__main__":
     
     ind_10_alpha = ind_10_factor['Alpha']
     ind_10_alpha.index = convertMonthToContinuous(ind_10_alpha.index)
+    
+    ind_10_alpha.plot(figsize = (12, 4))
+    plt.title("Industry Fama-French Five-Factor Model Alpha")
+    plt.savefig("alpha.png")
+    
     ind_10_rank = ind_10_alpha.rank(axis = 1, method = "max")
-    ind_10_rank.plot.area(stacked=False, ylim = (1,10), figsize = (12,8))
+    plt.figure(figsize = (12, 4))
+    for ind in ind_10_rank.columns:
+        plt.scatter(ind_10_rank.index, ind_10_rank[ind], marker = "s", label = ind)
+    plt.legend()
+    plt.title("Industry Ranking")
+    plt.savefig("IndustryRanking.png")
     # Ranking plot
     
     plt.figure(figsize = (8,6))
@@ -165,7 +182,13 @@ if __name__ == "__main__":
     des_49=descStatistics(ind_49,fiveFactor[['Month', 'RF']])
     
     res = validateInitStrategy(ind_10_alpha, ind_10, selection = long_ranking_filter)
+    benchmarkData = getSP500Data()
+    benchmarkData.index = convertMonthToContinuous(benchmarkData.Month)
     
+    res = pd.merge(res, benchmarkData, how = "left", left_index=True, right_index = True)
+    res["Benchmark"] = res.Close / res.Close.values[0]
+    
+    res[["Portfolio Value", "Benchmark"]].plot()    
     
     
     
