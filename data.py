@@ -80,7 +80,7 @@ def cleanMergeData(df):
     # calculate Book to Market ratio
     df['b2m'] = df['prc']*df['shrout']/(1000*df['atq'])
     # calculate the momentum measure as the return from the previous month minus MOM_LAG numbers of months
-    df['mom'] = df['prc']
+    # df['mom'] = df['prc']
     return df
 
 def getFiveFactorData(path = dropboxPath, dataPath = os.path.join("Validation Data", "F-F_Research_Data_5_Factors_2x3.CSV")):
