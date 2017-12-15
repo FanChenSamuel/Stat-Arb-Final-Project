@@ -126,6 +126,8 @@ def getCleanData(path = dropboxPath, dataPath = os.path.join("Project Data", "ca
 # The function will map the codes to Fama French
 def mapSector(df):
     for i in range(len(df["naics"])):
+        if i % 1000 == 0:
+            print(i)
         f4 = int(str(df["naics"][i])[:4])
         ind = ""
         if 100 <= f4 <= 999:
@@ -233,4 +235,5 @@ def mapSector(df):
         else:
             ind = "Other"
         df["naics"][i]=ind 
+    df= df.rename(columns = {'naics': 'ffind'})
     return df
